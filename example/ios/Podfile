@@ -30,5 +30,13 @@ target 'MediaCompositorExample' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+
+    installer.pods_project.targets.each do |target|
+      next unless target.name == 'react-native-video'
+
+      target.build_configurations.each do |build_configuration|
+        build_configuration.build_settings['SWIFT_VERSION'] = '5.0'
+      end
+    end
   end
 end

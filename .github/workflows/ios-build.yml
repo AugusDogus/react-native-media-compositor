@@ -50,8 +50,10 @@ jobs:
     name: Build iOS Example App
     runs-on: macOS-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
@@ -60,29 +62,36 @@ jobs:
       - name: Install dependencies (bun)
         run: bun install
 
+      - name: Build JS library
+        run: bun run build
+
+      - name: Check Nitro/codegen drift
+        run: bun run codegen && git diff --exit-code
+
       - name: Setup Ruby (bundle)
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'
           bundler-cache: true
-          working-directory: example/ios
-
-      - name: Install xcpretty
-        run: gem install xcpretty
+          working-directory: example
 
       - name: Cache CocoaPods
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cocoapods/repos
             example/ios/Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('example/ios/Podfile.lock') }}
+          key: ${{ runner.os }}-pods-${{ hashFiles('example/ios/Podfile.lock', 'example/Gemfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-pods-
 
       - name: Install Pods
-        working-directory: example/ios
-        run: pod install
+        working-directory: example
+        run: bundle exec pod install --project-directory=ios
+
+      - name: Lint example app
+        working-directory: example
+        run: bun run lint
 
       - name: Build App
         working-directory: example/ios
@@ -96,4 +105,4 @@ jobs:
             -configuration Debug \
             -destination 'platform=iOS Simulator,name=iPhone 16' \
             build \
-            CODE_SIGNING_ALLOWED=NO | xcpretty
+            CODE_SIGNING_ALLOWED=NO | bundle exec xcpretty
