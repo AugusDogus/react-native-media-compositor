@@ -28,6 +28,10 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22.14.0
       - name: Cache bun dependencies
         id: bun-cache
         uses: actions/cache@v5
