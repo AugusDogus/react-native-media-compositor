@@ -6,7 +6,9 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
-    "lib": ["esnext"],
+    "lib": [
+      "esnext"
+    ],
     "module": "esnext",
     "moduleResolution": "node",
     "noEmit": false,
@@ -31,7 +33,11 @@
     "**/jest.config.js",
     "**/babel.config.js",
     "**/metro.config.js",
-    "**/tsconfig.json"
+    "**/tsconfig.json",
+    "opensrc"
   ],
-  "include": ["src/**/*", "nitrogen/**/*.json"]
+  "include": [
+    "src/**/*",
+    "nitrogen/**/*.json"
+  ]
 }
