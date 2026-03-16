@@ -40,11 +40,11 @@
   "workspaces": [
     "example"
   ],
-  "repository": "https://github.com/augusdogus/react-native-media-compositor.git",
+  "repository": "https://github.com/AugusDogus/react-native-media-compositor",
   "author": "AugusDogus",
   "license": "MIT",
-  "bugs": "https://github.com/augusdogus/react-native-media-compositor/issues",
-  "homepage": "https://github.com/augusdogus/react-native-media-compositor#readme",
+  "bugs": "https://github.com/AugusDogus/react-native-media-compositor/issues",
+  "homepage": "https://github.com/AugusDogus/react-native-media-compositor#readme",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
