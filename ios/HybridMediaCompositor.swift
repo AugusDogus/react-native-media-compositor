@@ -45,6 +45,237 @@ private struct OverlayRenderFrame {
   let scale: CGFloat
 }
 
+private final class ExportSessionBox: @unchecked Sendable {
+  let session: AVAssetExportSession
+
+  init(_ session: AVAssetExportSession) {
+    self.session = session
+  }
+}
+
+private enum MediaCompositorColorParser {
+  static func color(from hex: String, opacity: Double) throws -> UIColor {
+    let sanitized = hex
+      .trimmingCharacters(in: .whitespacesAndNewlines)
+      .replacingOccurrences(of: "#", with: "")
+    let scanner = Scanner(string: sanitized)
+    var value: UInt64 = 0
+
+    guard scanner.scanHexInt64(&value) else {
+      throw MediaCompositorError.invalidColor(hex)
+    }
+
+    let baseColor: UIColor
+    switch sanitized.count {
+    case 6:
+      baseColor = UIColor(
+        red: CGFloat((value & 0xFF0000) >> 16) / 255,
+        green: CGFloat((value & 0x00FF00) >> 8) / 255,
+        blue: CGFloat(value & 0x0000FF) / 255,
+        alpha: 1
+      )
+    case 8:
+      baseColor = UIColor(
+        red: CGFloat((value & 0xFF000000) >> 24) / 255,
+        green: CGFloat((value & 0x00FF0000) >> 16) / 255,
+        blue: CGFloat((value & 0x0000FF00) >> 8) / 255,
+        alpha: CGFloat(value & 0x000000FF) / 255
+      )
+    default:
+      throw MediaCompositorError.invalidColor(hex)
+    }
+
+    let clampedOpacity = CGFloat(min(max(opacity, 0), 1))
+    return baseColor.withAlphaComponent(baseColor.cgColor.alpha * clampedOpacity)
+  }
+}
+
+private enum MediaCompositorOverlayRenderer {
+  static func renderCanvas(
+    size: CGSize,
+    overlays: [MediaCompositorTextOverlay],
+    preview: MediaCompositorPreviewSpec?
+  ) throws -> UIImage? {
+    let drawableOverlays = overlays.filter {
+      !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    if drawableOverlays.isEmpty {
+      return nil
+    }
+
+    let format = UIGraphicsImageRendererFormat.default()
+    format.opaque = false
+    format.scale = 1
+
+    let renderer = UIGraphicsImageRenderer(size: size, format: format)
+    var renderError: Error?
+    let image = renderer.image { _ in
+      do {
+        for overlay in drawableOverlays {
+          let renderFrame = try overlayRenderFrame(
+            rect: overlay.rect,
+            renderSize: size,
+            preview: preview,
+            overlayId: overlay.id
+          )
+          try drawTextOverlay(
+            overlay,
+            in: renderFrame.frame,
+            scale: renderFrame.scale
+          )
+        }
+      } catch {
+        renderError = error
+      }
+    }
+
+    if let renderError {
+      throw renderError
+    }
+
+    return image
+  }
+
+  private static func drawTextOverlay(
+    _ overlay: MediaCompositorTextOverlay,
+    in frame: CGRect,
+    scale: CGFloat
+  ) throws {
+    let trimmedText = overlay.text.trimmingCharacters(in: .whitespacesAndNewlines)
+    if trimmedText.isEmpty {
+      return
+    }
+
+    let style = overlay.style
+    let textColor = try MediaCompositorColorParser.color(
+      from: style.textColor,
+      opacity: style.opacity ?? 1
+    )
+    let backgroundColor = try MediaCompositorColorParser.color(
+      from: style.backgroundColor ?? "#00000000",
+      opacity: style.opacity ?? 1
+    )
+
+    let horizontalPadding = CGFloat(style.paddingHorizontal ?? 12) * scale
+    let verticalPadding = CGFloat(style.paddingVertical ?? 6) * scale
+    let cornerRadius = CGFloat(style.cornerRadius ?? 0) * scale
+    let fontSize = max(CGFloat(style.fontSize) * scale, 12)
+    let maxTextWidth = max(1, frame.width - horizontalPadding * 2)
+
+    let paragraphStyle = NSMutableParagraphStyle()
+    paragraphStyle.alignment = textAlignment(for: style.textAlign ?? .center)
+    paragraphStyle.lineBreakMode = .byWordWrapping
+
+    let attributes: [NSAttributedString.Key: Any] = [
+      .font: UIFont.systemFont(ofSize: fontSize, weight: .regular),
+      .foregroundColor: textColor,
+      .paragraphStyle: paragraphStyle,
+    ]
+
+    let attributedText = NSAttributedString(
+      string: trimmedText,
+      attributes: attributes
+    )
+    let textBounds = attributedText.boundingRect(
+      with: CGSize(width: maxTextWidth, height: .greatestFiniteMagnitude),
+      options: [.usesLineFragmentOrigin, .usesFontLeading],
+      context: nil
+    ).integral
+
+    let bubbleHeight = max(frame.height, ceil(textBounds.height) + verticalPadding * 2)
+    let bubbleY = min(frame.minY, max(0, frame.maxY - bubbleHeight))
+    let bubbleRect = CGRect(
+      x: frame.minX,
+      y: bubbleY,
+      width: frame.width,
+      height: bubbleHeight
+    )
+    let textRect = CGRect(
+      x: bubbleRect.minX + horizontalPadding,
+      y: bubbleRect.minY + verticalPadding,
+      width: maxTextWidth,
+      height: bubbleRect.height - verticalPadding * 2
+    )
+
+    if backgroundColor.cgColor.alpha > 0 {
+      let bubblePath = UIBezierPath(
+        roundedRect: bubbleRect,
+        cornerRadius: cornerRadius
+      )
+      backgroundColor.setFill()
+      bubblePath.fill()
+    }
+
+    attributedText.draw(
+      with: textRect,
+      options: [.usesLineFragmentOrigin, .usesFontLeading],
+      context: nil
+    )
+  }
+
+  private static func overlayRenderFrame(
+    rect: MediaCompositorNormalizedRect,
+    renderSize: CGSize,
+    preview: MediaCompositorPreviewSpec?,
+    overlayId: String
+  ) throws -> OverlayRenderFrame {
+    guard
+      renderSize.width > 0,
+      renderSize.height > 0,
+      rect.width > 0,
+      rect.height > 0
+    else {
+      throw MediaCompositorError.invalidOverlayFrame(overlayId)
+    }
+
+    let width = min(max(CGFloat(rect.width) * renderSize.width, 1), renderSize.width)
+    let height = min(max(CGFloat(rect.height) * renderSize.height, 1), renderSize.height)
+    let x = clamp(
+      CGFloat(rect.x) * renderSize.width,
+      lower: 0,
+      upper: renderSize.width - width
+    )
+    let y = clamp(
+      CGFloat(rect.y) * renderSize.height,
+      lower: 0,
+      upper: renderSize.height - height
+    )
+
+    let scale: CGFloat
+    if let preview, preview.width > 0, preview.height > 0 {
+      scale = renderSize.width / CGFloat(preview.width)
+    } else {
+      scale = 1
+    }
+
+    return OverlayRenderFrame(
+      frame: CGRect(x: x, y: y, width: width, height: height),
+      scale: scale
+    )
+  }
+
+  private static func textAlignment(
+    for alignment: MediaCompositorTextAlign
+  ) -> NSTextAlignment {
+    switch alignment {
+    case .left:
+      return .left
+    case .center:
+      return .center
+    case .right:
+      return .right
+    }
+  }
+
+  private static func clamp<T: Comparable>(
+    _ value: T,
+    lower: T,
+    upper: T
+  ) -> T {
+    min(max(value, lower), upper)
+  }
+}
+
 final class HybridMediaCompositor: HybridMediaCompositorSpec {
   private let stateLock = NSLock()
   private var currentStatus: MediaCompositorStatus = .idle
@@ -293,8 +524,10 @@ final class HybridMediaCompositor: HybridMediaCompositorSpec {
   }
 
   private func export(session: AVAssetExportSession) async throws {
+    let sessionBox = ExportSessionBox(session)
     try await withCheckedThrowingContinuation { continuation in
-      session.exportAsynchronously {
+      sessionBox.session.exportAsynchronously {
+        let session = sessionBox.session
         switch session.status {
         case .completed:
           continuation.resume()
@@ -339,133 +572,10 @@ final class HybridMediaCompositor: HybridMediaCompositorSpec {
     overlays: [MediaCompositorTextOverlay],
     preview: MediaCompositorPreviewSpec?
   ) throws -> UIImage? {
-    let drawableOverlays = overlays.filter { !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
-    if drawableOverlays.isEmpty {
-      return nil
-    }
-
-    let format = UIGraphicsImageRendererFormat.default()
-    format.opaque = false
-    format.scale = 1
-
-    let renderer = UIGraphicsImageRenderer(size: size, format: format)
-    return try renderer.image { _ in
-      for overlay in drawableOverlays {
-        let renderFrame = try self.overlayRenderFrame(
-          rect: overlay.rect,
-          renderSize: size,
-          preview: preview,
-          overlayId: overlay.id
-        )
-        try self.drawTextOverlay(overlay, in: renderFrame.frame, scale: renderFrame.scale)
-      }
-    }
-  }
-
-  private func drawTextOverlay(
-    _ overlay: MediaCompositorTextOverlay,
-    in frame: CGRect,
-    scale: CGFloat
-  ) throws {
-    let trimmedText = overlay.text.trimmingCharacters(in: .whitespacesAndNewlines)
-    if trimmedText.isEmpty {
-      return
-    }
-
-    let style = overlay.style
-    let textColor = try color(
-      from: style.textColor,
-      opacity: style.opacity ?? 1
-    )
-    let backgroundColor = try color(
-      from: style.backgroundColor ?? "#00000000",
-      opacity: style.opacity ?? 1
-    )
-
-    let horizontalPadding = CGFloat(style.paddingHorizontal ?? 12) * scale
-    let verticalPadding = CGFloat(style.paddingVertical ?? 6) * scale
-    let cornerRadius = CGFloat(style.cornerRadius ?? 0) * scale
-    let fontSize = max(CGFloat(style.fontSize) * scale, 12)
-    let maxTextWidth = max(1, frame.width - horizontalPadding * 2)
-
-    let paragraphStyle = NSMutableParagraphStyle()
-    paragraphStyle.alignment = textAlignment(for: style.textAlign ?? .center)
-    paragraphStyle.lineBreakMode = .byWordWrapping
-
-    let attributes: [NSAttributedString.Key: Any] = [
-      .font: UIFont.systemFont(ofSize: fontSize, weight: .regular),
-      .foregroundColor: textColor,
-      .paragraphStyle: paragraphStyle,
-    ]
-
-    let attributedText = NSAttributedString(string: trimmedText, attributes: attributes)
-    let textBounds = attributedText.boundingRect(
-      with: CGSize(width: maxTextWidth, height: .greatestFiniteMagnitude),
-      options: [.usesLineFragmentOrigin, .usesFontLeading],
-      context: nil
-    ).integral
-
-    let bubbleHeight = max(frame.height, ceil(textBounds.height) + verticalPadding * 2)
-    let bubbleY = min(frame.minY, max(0, frame.maxY - bubbleHeight))
-    let bubbleRect = CGRect(
-      x: frame.minX,
-      y: bubbleY,
-      width: frame.width,
-      height: bubbleHeight
-    )
-    let textRect = CGRect(
-      x: bubbleRect.minX + horizontalPadding,
-      y: bubbleRect.minY + verticalPadding,
-      width: maxTextWidth,
-      height: bubbleRect.height - verticalPadding * 2
-    )
-
-    if backgroundColor.cgColor.alpha > 0 {
-      let bubblePath = UIBezierPath(
-        roundedRect: bubbleRect,
-        cornerRadius: cornerRadius
-      )
-      backgroundColor.setFill()
-      bubblePath.fill()
-    }
-
-    attributedText.draw(
-      with: textRect,
-      options: [.usesLineFragmentOrigin, .usesFontLeading],
-      context: nil
-    )
-  }
-
-  private func overlayRenderFrame(
-    rect: MediaCompositorNormalizedRect,
-    renderSize: CGSize,
-    preview: MediaCompositorPreviewSpec?,
-    overlayId: String
-  ) throws -> OverlayRenderFrame {
-    guard
-      renderSize.width > 0,
-      renderSize.height > 0,
-      rect.width > 0,
-      rect.height > 0
-    else {
-      throw MediaCompositorError.invalidOverlayFrame(overlayId)
-    }
-
-    let width = min(max(CGFloat(rect.width) * renderSize.width, 1), renderSize.width)
-    let height = min(max(CGFloat(rect.height) * renderSize.height, 1), renderSize.height)
-    let x = clamped(CGFloat(rect.x) * renderSize.width, lower: 0, upper: renderSize.width - width)
-    let y = clamped(CGFloat(rect.y) * renderSize.height, lower: 0, upper: renderSize.height - height)
-
-    let scale: CGFloat
-    if let preview, preview.width > 0, preview.height > 0 {
-      scale = renderSize.width / CGFloat(preview.width)
-    } else {
-      scale = 1
-    }
-
-    return OverlayRenderFrame(
-      frame: CGRect(x: x, y: y, width: width, height: height),
-      scale: scale
+    try MediaCompositorOverlayRenderer.renderCanvas(
+      size: size,
+      overlays: overlays,
+      preview: preview
     )
   }
 
@@ -667,55 +777,6 @@ final class HybridMediaCompositor: HybridMediaCompositorSpec {
       )
     }
     return CMTime(value: 1, timescale: 30)
-  }
-
-  private func textAlignment(for alignment: MediaCompositorTextAlign) -> NSTextAlignment {
-    switch alignment {
-    case .left:
-      return .left
-    case .center:
-      return .center
-    case .right:
-      return .right
-    }
-  }
-
-  private func color(
-    from hex: String,
-    opacity: Double
-  ) throws -> UIColor {
-    let sanitized = hex
-      .trimmingCharacters(in: .whitespacesAndNewlines)
-      .replacingOccurrences(of: "#", with: "")
-    let scanner = Scanner(string: sanitized)
-    var value: UInt64 = 0
-
-    guard scanner.scanHexInt64(&value) else {
-      throw MediaCompositorError.invalidColor(hex)
-    }
-
-    let baseColor: UIColor
-    switch sanitized.count {
-    case 6:
-      baseColor = UIColor(
-        red: CGFloat((value & 0xFF0000) >> 16) / 255,
-        green: CGFloat((value & 0x00FF00) >> 8) / 255,
-        blue: CGFloat(value & 0x0000FF) / 255,
-        alpha: 1
-      )
-    case 8:
-      baseColor = UIColor(
-        red: CGFloat((value & 0xFF000000) >> 24) / 255,
-        green: CGFloat((value & 0x00FF0000) >> 16) / 255,
-        blue: CGFloat((value & 0x0000FF00) >> 8) / 255,
-        alpha: CGFloat(value & 0x000000FF) / 255
-      )
-    default:
-      throw MediaCompositorError.invalidColor(hex)
-    }
-
-    let clampedOpacity = CGFloat(clamped(opacity, lower: 0, upper: 1))
-    return baseColor.withAlphaComponent(baseColor.cgColor.alpha * clampedOpacity)
   }
 
   private func clamped<T: Comparable>(
