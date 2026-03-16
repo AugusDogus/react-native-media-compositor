@@ -1,3 +1,9 @@
+## [1.0.1](https://github.com/AugusDogus/react-native-media-compositor/compare/v1.0.0...v1.0.1) (2026-03-16)
+
+### 🐛 Bug Fixes
+
+* **package:** align repository metadata with npm provenance ([dc2865f](https://github.com/AugusDogus/react-native-media-compositor/commit/dc2865f35dc99a3bb42d46b6396c2ad9a4290bfb))
+
 ## 1.0.0 (2026-03-16)
 
 ### ✨ Features
