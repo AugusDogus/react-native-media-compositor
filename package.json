@@ -16,14 +16,13 @@
   },
   "keywords": [
     "react-native",
-    "react-native-media-compositor"
+    "react-native-media-compositor",
+    "react-native-nitro-modules"
   ],
   "files": [
     "src",
-    "react-native.config.js",
     "lib",
     "nitrogen",
-    "cpp",
     "nitro.json",
     "android/build.gradle",
     "android/fix-prefab.gradle",
@@ -35,7 +34,6 @@
     "ios/**/*.mm",
     "ios/**/*.cpp",
     "ios/**/*.swift",
-    "app.plugin.js",
     "*.podspec",
     "README.md"
   ],

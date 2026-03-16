@@ -10,12 +10,46 @@
 // Forward declarations of C++ defined types
 // Forward declaration of `HybridMediaCompositorSpec` to properly resolve imports.
 namespace margelo::nitro::mediacompositor { class HybridMediaCompositorSpec; }
+// Forward declaration of `MediaCompositorImageFormat` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { enum class MediaCompositorImageFormat; }
+// Forward declaration of `MediaCompositorImageRequest` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorImageRequest; }
+// Forward declaration of `MediaCompositorNormalizedRect` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorNormalizedRect; }
+// Forward declaration of `MediaCompositorPreviewSpec` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorPreviewSpec; }
+// Forward declaration of `MediaCompositorResult` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorResult; }
+// Forward declaration of `MediaCompositorStatus` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { enum class MediaCompositorStatus; }
+// Forward declaration of `MediaCompositorTextAlign` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { enum class MediaCompositorTextAlign; }
+// Forward declaration of `MediaCompositorTextOverlay` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorTextOverlay; }
+// Forward declaration of `MediaCompositorTextStyle` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorTextStyle; }
+// Forward declaration of `MediaCompositorVideoRequest` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorVideoRequest; }
 
 // Include C++ defined types
 #include "HybridMediaCompositorSpec.hpp"
+#include "MediaCompositorImageFormat.hpp"
+#include "MediaCompositorImageRequest.hpp"
+#include "MediaCompositorNormalizedRect.hpp"
+#include "MediaCompositorPreviewSpec.hpp"
+#include "MediaCompositorResult.hpp"
+#include "MediaCompositorStatus.hpp"
+#include "MediaCompositorTextAlign.hpp"
+#include "MediaCompositorTextOverlay.hpp"
+#include "MediaCompositorTextStyle.hpp"
+#include "MediaCompositorVideoRequest.hpp"
+#include <NitroModules/Promise.hpp>
 #include <NitroModules/Result.hpp>
 #include <exception>
 #include <memory>
+#include <optional>
+#include <string>
+#include <vector>
 
 // C++ helpers for Swift
 #include "MediaCompositor-Swift-Cxx-Bridge.hpp"

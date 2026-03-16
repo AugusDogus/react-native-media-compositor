@@ -50,11 +50,14 @@ namespace margelo::nitro::mediacompositor {
 
   public:
     // Properties
-    
+    bool getIsProcessing() override;
+    MediaCompositorStatus getStatus() override;
 
   public:
     // Methods
-    double sum(double num1, double num2) override;
+    std::shared_ptr<Promise<MediaCompositorResult>> composeImage(const MediaCompositorImageRequest& request) override;
+    std::shared_ptr<Promise<MediaCompositorResult>> composeVideo(const MediaCompositorVideoRequest& request) override;
+    std::shared_ptr<Promise<void>> cancel() override;
 
   private:
     jni::global_ref<JHybridMediaCompositorSpec::JavaPart> _javaPart;

@@ -36,9 +36,9 @@ def getExtOrIntegerDefault(name) {
 }
 
 android {
-  namespace "com.mediacompositor"
+  namespace = "com.mediacompositor"
 
-  ndkVersion getExtOrDefault("ndkVersion")
+  ndkVersion = getExtOrDefault("ndkVersion")
   compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
 
   defaultConfig {
@@ -92,8 +92,8 @@ android {
   }
 
   buildFeatures {
-    buildConfig true
-    prefab true
+    buildConfig = true
+    prefab = true
   }
 
   buildTypes {
@@ -137,6 +137,9 @@ dependencies {
 
   // Add a dependency on NitroModules
   implementation project(":react-native-nitro-modules")
+  implementation "androidx.media3:media3-common:1.8.0"
+  implementation "androidx.media3:media3-effect:1.8.0"
+  implementation "androidx.media3:media3-transformer:1.8.0"
 }
 
 if (isNewArchitectureEnabled()) {

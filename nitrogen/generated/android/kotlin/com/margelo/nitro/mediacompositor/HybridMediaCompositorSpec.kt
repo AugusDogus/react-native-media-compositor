@@ -10,6 +10,7 @@ package com.margelo.nitro.mediacompositor
 import androidx.annotation.Keep
 import com.facebook.jni.HybridData
 import com.facebook.proguard.annotations.DoNotStrip
+import com.margelo.nitro.core.Promise
 import com.margelo.nitro.core.HybridObject
 
 /**
@@ -25,12 +26,26 @@ import com.margelo.nitro.core.HybridObject
 )
 abstract class HybridMediaCompositorSpec: HybridObject() {
   // Properties
+  @get:DoNotStrip
+  @get:Keep
+  abstract val isProcessing: Boolean
   
+  @get:DoNotStrip
+  @get:Keep
+  abstract val status: MediaCompositorStatus
 
   // Methods
   @DoNotStrip
   @Keep
-  abstract fun sum(num1: Double, num2: Double): Double
+  abstract fun composeImage(request: MediaCompositorImageRequest): Promise<MediaCompositorResult>
+  
+  @DoNotStrip
+  @Keep
+  abstract fun composeVideo(request: MediaCompositorVideoRequest): Promise<MediaCompositorResult>
+  
+  @DoNotStrip
+  @Keep
+  abstract fun cancel(): Promise<Unit>
 
   // Default implementation of `HybridObject.toString()`
   override fun toString(): String {

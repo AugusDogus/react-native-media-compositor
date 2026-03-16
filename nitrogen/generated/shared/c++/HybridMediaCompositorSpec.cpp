@@ -14,7 +14,11 @@ namespace margelo::nitro::mediacompositor {
     HybridObject::loadHybridMethods();
     // load custom methods/properties
     registerHybrids(this, [](Prototype& prototype) {
-      prototype.registerHybridMethod("sum", &HybridMediaCompositorSpec::sum);
+      prototype.registerHybridGetter("isProcessing", &HybridMediaCompositorSpec::getIsProcessing);
+      prototype.registerHybridGetter("status", &HybridMediaCompositorSpec::getStatus);
+      prototype.registerHybridMethod("composeImage", &HybridMediaCompositorSpec::composeImage);
+      prototype.registerHybridMethod("composeVideo", &HybridMediaCompositorSpec::composeVideo);
+      prototype.registerHybridMethod("cancel", &HybridMediaCompositorSpec::cancel);
     });
   }
 

@@ -12,9 +12,41 @@
 // Forward declaration of `HybridMediaCompositorSpec_cxx` to properly resolve imports.
 namespace MediaCompositor { class HybridMediaCompositorSpec_cxx; }
 
+// Forward declaration of `MediaCompositorStatus` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { enum class MediaCompositorStatus; }
+// Forward declaration of `MediaCompositorResult` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorResult; }
+// Forward declaration of `MediaCompositorImageRequest` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorImageRequest; }
+// Forward declaration of `MediaCompositorImageFormat` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { enum class MediaCompositorImageFormat; }
+// Forward declaration of `MediaCompositorPreviewSpec` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorPreviewSpec; }
+// Forward declaration of `MediaCompositorTextOverlay` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorTextOverlay; }
+// Forward declaration of `MediaCompositorNormalizedRect` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorNormalizedRect; }
+// Forward declaration of `MediaCompositorTextStyle` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorTextStyle; }
+// Forward declaration of `MediaCompositorTextAlign` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { enum class MediaCompositorTextAlign; }
+// Forward declaration of `MediaCompositorVideoRequest` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorVideoRequest; }
 
-
-
+#include "MediaCompositorStatus.hpp"
+#include "MediaCompositorResult.hpp"
+#include <NitroModules/Promise.hpp>
+#include <string>
+#include "MediaCompositorImageRequest.hpp"
+#include <optional>
+#include "MediaCompositorImageFormat.hpp"
+#include "MediaCompositorPreviewSpec.hpp"
+#include "MediaCompositorTextOverlay.hpp"
+#include <vector>
+#include "MediaCompositorNormalizedRect.hpp"
+#include "MediaCompositorTextStyle.hpp"
+#include "MediaCompositorTextAlign.hpp"
+#include "MediaCompositorVideoRequest.hpp"
 
 #include "MediaCompositor-Swift-Cxx-Umbrella.hpp"
 
@@ -62,12 +94,34 @@ namespace margelo::nitro::mediacompositor {
 
   public:
     // Properties
-    
+    inline bool getIsProcessing() noexcept override {
+      return _swiftPart.isProcessing();
+    }
+    inline MediaCompositorStatus getStatus() noexcept override {
+      auto __result = _swiftPart.getStatus();
+      return static_cast<MediaCompositorStatus>(__result);
+    }
 
   public:
     // Methods
-    inline double sum(double num1, double num2) override {
-      auto __result = _swiftPart.sum(std::forward<decltype(num1)>(num1), std::forward<decltype(num2)>(num2));
+    inline std::shared_ptr<Promise<MediaCompositorResult>> composeImage(const MediaCompositorImageRequest& request) override {
+      auto __result = _swiftPart.composeImage(std::forward<decltype(request)>(request));
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+      auto __value = std::move(__result.value());
+      return __value;
+    }
+    inline std::shared_ptr<Promise<MediaCompositorResult>> composeVideo(const MediaCompositorVideoRequest& request) override {
+      auto __result = _swiftPart.composeVideo(std::forward<decltype(request)>(request));
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+      auto __value = std::move(__result.value());
+      return __value;
+    }
+    inline std::shared_ptr<Promise<void>> cancel() override {
+      auto __result = _swiftPart.cancel();
       if (__result.hasError()) [[unlikely]] {
         std::rethrow_exception(__result.error());
       }

@@ -14,6 +14,30 @@
 
 namespace margelo::nitro::mediacompositor::bridge::swift {
 
+  // pragma MARK: std::function<void(const MediaCompositorResult& /* result */)>
+  Func_void_MediaCompositorResult create_Func_void_MediaCompositorResult(void* NON_NULL swiftClosureWrapper) noexcept {
+    auto swiftClosure = MediaCompositor::Func_void_MediaCompositorResult::fromUnsafe(swiftClosureWrapper);
+    return [swiftClosure = std::move(swiftClosure)](const MediaCompositorResult& result) mutable -> void {
+      swiftClosure.call(result);
+    };
+  }
+  
+  // pragma MARK: std::function<void(const std::exception_ptr& /* error */)>
+  Func_void_std__exception_ptr create_Func_void_std__exception_ptr(void* NON_NULL swiftClosureWrapper) noexcept {
+    auto swiftClosure = MediaCompositor::Func_void_std__exception_ptr::fromUnsafe(swiftClosureWrapper);
+    return [swiftClosure = std::move(swiftClosure)](const std::exception_ptr& error) mutable -> void {
+      swiftClosure.call(error);
+    };
+  }
+  
+  // pragma MARK: std::function<void()>
+  Func_void create_Func_void(void* NON_NULL swiftClosureWrapper) noexcept {
+    auto swiftClosure = MediaCompositor::Func_void::fromUnsafe(swiftClosureWrapper);
+    return [swiftClosure = std::move(swiftClosure)]() mutable -> void {
+      swiftClosure.call();
+    };
+  }
+  
   // pragma MARK: std::shared_ptr<HybridMediaCompositorSpec>
   std::shared_ptr<HybridMediaCompositorSpec> create_std__shared_ptr_HybridMediaCompositorSpec_(void* NON_NULL swiftUnsafePointer) noexcept {
     MediaCompositor::HybridMediaCompositorSpec_cxx swiftPart = MediaCompositor::HybridMediaCompositorSpec_cxx::fromUnsafe(swiftUnsafePointer);

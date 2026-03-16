@@ -13,9 +13,20 @@
 #error NitroModules cannot be found! Are you sure you installed NitroModules properly?
 #endif
 
+// Forward declaration of `MediaCompositorStatus` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { enum class MediaCompositorStatus; }
+// Forward declaration of `MediaCompositorResult` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorResult; }
+// Forward declaration of `MediaCompositorImageRequest` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorImageRequest; }
+// Forward declaration of `MediaCompositorVideoRequest` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorVideoRequest; }
 
-
-
+#include "MediaCompositorStatus.hpp"
+#include "MediaCompositorResult.hpp"
+#include <NitroModules/Promise.hpp>
+#include "MediaCompositorImageRequest.hpp"
+#include "MediaCompositorVideoRequest.hpp"
 
 namespace margelo::nitro::mediacompositor {
 
@@ -44,11 +55,14 @@ namespace margelo::nitro::mediacompositor {
 
     public:
       // Properties
-      
+      virtual bool getIsProcessing() = 0;
+      virtual MediaCompositorStatus getStatus() = 0;
 
     public:
       // Methods
-      virtual double sum(double num1, double num2) = 0;
+      virtual std::shared_ptr<Promise<MediaCompositorResult>> composeImage(const MediaCompositorImageRequest& request) = 0;
+      virtual std::shared_ptr<Promise<MediaCompositorResult>> composeVideo(const MediaCompositorVideoRequest& request) = 0;
+      virtual std::shared_ptr<Promise<void>> cancel() = 0;
 
     protected:
       // Hybrid Setup

@@ -14,11 +14,18 @@
   },
   "autolinking": {
     "MediaCompositor": {
-      "swift": "HybridMediaCompositor",
-      "kotlin": "HybridMediaCompositor"
+      "ios": {
+        "language": "swift",
+        "implementationClassName": "HybridMediaCompositor"
+      },
+      "android": {
+        "language": "kotlin",
+        "implementationClassName": "HybridMediaCompositor"
+      }
     }
   },
   "ignorePaths": [
-    "**/node_modules"
+    "**/node_modules",
+    "opensrc/**"
   ]
 }

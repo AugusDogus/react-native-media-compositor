@@ -7,9 +7,53 @@
 
 #include "JHybridMediaCompositorSpec.hpp"
 
+// Forward declaration of `MediaCompositorStatus` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { enum class MediaCompositorStatus; }
+// Forward declaration of `MediaCompositorResult` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorResult; }
+// Forward declaration of `MediaCompositorImageRequest` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorImageRequest; }
+// Forward declaration of `MediaCompositorImageFormat` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { enum class MediaCompositorImageFormat; }
+// Forward declaration of `MediaCompositorPreviewSpec` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorPreviewSpec; }
+// Forward declaration of `MediaCompositorTextOverlay` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorTextOverlay; }
+// Forward declaration of `MediaCompositorNormalizedRect` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorNormalizedRect; }
+// Forward declaration of `MediaCompositorTextStyle` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorTextStyle; }
+// Forward declaration of `MediaCompositorTextAlign` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { enum class MediaCompositorTextAlign; }
+// Forward declaration of `MediaCompositorVideoRequest` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorVideoRequest; }
 
-
-
+#include "MediaCompositorStatus.hpp"
+#include "JMediaCompositorStatus.hpp"
+#include "MediaCompositorResult.hpp"
+#include <NitroModules/Promise.hpp>
+#include <NitroModules/JPromise.hpp>
+#include "JMediaCompositorResult.hpp"
+#include <string>
+#include <NitroModules/JUnit.hpp>
+#include "MediaCompositorImageRequest.hpp"
+#include "JMediaCompositorImageRequest.hpp"
+#include <optional>
+#include "MediaCompositorImageFormat.hpp"
+#include "JMediaCompositorImageFormat.hpp"
+#include "MediaCompositorPreviewSpec.hpp"
+#include "JMediaCompositorPreviewSpec.hpp"
+#include "MediaCompositorTextOverlay.hpp"
+#include <vector>
+#include "JMediaCompositorTextOverlay.hpp"
+#include "MediaCompositorNormalizedRect.hpp"
+#include "JMediaCompositorNormalizedRect.hpp"
+#include "MediaCompositorTextStyle.hpp"
+#include "JMediaCompositorTextStyle.hpp"
+#include "MediaCompositorTextAlign.hpp"
+#include "JMediaCompositorTextAlign.hpp"
+#include "MediaCompositorVideoRequest.hpp"
+#include "JMediaCompositorVideoRequest.hpp"
 
 namespace margelo::nitro::mediacompositor {
 
@@ -41,13 +85,64 @@ namespace margelo::nitro::mediacompositor {
   }
 
   // Properties
-  
+  bool JHybridMediaCompositorSpec::getIsProcessing() {
+    static const auto method = _javaPart->javaClassStatic()->getMethod<jboolean()>("isProcessing");
+    auto __result = method(_javaPart);
+    return static_cast<bool>(__result);
+  }
+  MediaCompositorStatus JHybridMediaCompositorSpec::getStatus() {
+    static const auto method = _javaPart->javaClassStatic()->getMethod<jni::local_ref<JMediaCompositorStatus>()>("getStatus");
+    auto __result = method(_javaPart);
+    return __result->toCpp();
+  }
 
   // Methods
-  double JHybridMediaCompositorSpec::sum(double num1, double num2) {
-    static const auto method = _javaPart->javaClassStatic()->getMethod<double(double /* num1 */, double /* num2 */)>("sum");
-    auto __result = method(_javaPart, num1, num2);
-    return __result;
+  std::shared_ptr<Promise<MediaCompositorResult>> JHybridMediaCompositorSpec::composeImage(const MediaCompositorImageRequest& request) {
+    static const auto method = _javaPart->javaClassStatic()->getMethod<jni::local_ref<JPromise::javaobject>(jni::alias_ref<JMediaCompositorImageRequest> /* request */)>("composeImage");
+    auto __result = method(_javaPart, JMediaCompositorImageRequest::fromCpp(request));
+    return [&]() {
+      auto __promise = Promise<MediaCompositorResult>::create();
+      __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& __boxedResult) {
+        auto __result = jni::static_ref_cast<JMediaCompositorResult>(__boxedResult);
+        __promise->resolve(__result->toCpp());
+      });
+      __result->cthis()->addOnRejectedListener([=](const jni::alias_ref<jni::JThrowable>& __throwable) {
+        jni::JniException __jniError(__throwable);
+        __promise->reject(std::make_exception_ptr(__jniError));
+      });
+      return __promise;
+    }();
+  }
+  std::shared_ptr<Promise<MediaCompositorResult>> JHybridMediaCompositorSpec::composeVideo(const MediaCompositorVideoRequest& request) {
+    static const auto method = _javaPart->javaClassStatic()->getMethod<jni::local_ref<JPromise::javaobject>(jni::alias_ref<JMediaCompositorVideoRequest> /* request */)>("composeVideo");
+    auto __result = method(_javaPart, JMediaCompositorVideoRequest::fromCpp(request));
+    return [&]() {
+      auto __promise = Promise<MediaCompositorResult>::create();
+      __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& __boxedResult) {
+        auto __result = jni::static_ref_cast<JMediaCompositorResult>(__boxedResult);
+        __promise->resolve(__result->toCpp());
+      });
+      __result->cthis()->addOnRejectedListener([=](const jni::alias_ref<jni::JThrowable>& __throwable) {
+        jni::JniException __jniError(__throwable);
+        __promise->reject(std::make_exception_ptr(__jniError));
+      });
+      return __promise;
+    }();
+  }
+  std::shared_ptr<Promise<void>> JHybridMediaCompositorSpec::cancel() {
+    static const auto method = _javaPart->javaClassStatic()->getMethod<jni::local_ref<JPromise::javaobject>()>("cancel");
+    auto __result = method(_javaPart);
+    return [&]() {
+      auto __promise = Promise<void>::create();
+      __result->cthis()->addOnResolvedListener([=](const jni::alias_ref<jni::JObject>& /* unit */) {
+        __promise->resolve();
+      });
+      __result->cthis()->addOnRejectedListener([=](const jni::alias_ref<jni::JThrowable>& __throwable) {
+        jni::JniException __jniError(__throwable);
+        __promise->reject(std::make_exception_ptr(__jniError));
+      });
+      return __promise;
+    }();
   }
 
 } // namespace margelo::nitro::mediacompositor

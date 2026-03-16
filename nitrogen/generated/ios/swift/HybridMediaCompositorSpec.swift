@@ -10,10 +10,13 @@ import NitroModules
 /// See ``HybridMediaCompositorSpec``
 public protocol HybridMediaCompositorSpec_protocol: HybridObject {
   // Properties
-  
+  var isProcessing: Bool { get }
+  var status: MediaCompositorStatus { get }
 
   // Methods
-  func sum(num1: Double, num2: Double) throws -> Double
+  func composeImage(request: MediaCompositorImageRequest) throws -> Promise<MediaCompositorResult>
+  func composeVideo(request: MediaCompositorVideoRequest) throws -> Promise<MediaCompositorResult>
+  func cancel() throws -> Promise<Void>
 }
 
 public extension HybridMediaCompositorSpec_protocol {

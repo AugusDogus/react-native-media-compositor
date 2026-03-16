@@ -10,6 +10,20 @@
 // Forward declarations of C++ defined types
 // Forward declaration of `HybridMediaCompositorSpec` to properly resolve imports.
 namespace margelo::nitro::mediacompositor { class HybridMediaCompositorSpec; }
+// Forward declaration of `MediaCompositorImageFormat` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { enum class MediaCompositorImageFormat; }
+// Forward declaration of `MediaCompositorNormalizedRect` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorNormalizedRect; }
+// Forward declaration of `MediaCompositorPreviewSpec` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorPreviewSpec; }
+// Forward declaration of `MediaCompositorResult` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorResult; }
+// Forward declaration of `MediaCompositorTextAlign` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { enum class MediaCompositorTextAlign; }
+// Forward declaration of `MediaCompositorTextOverlay` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorTextOverlay; }
+// Forward declaration of `MediaCompositorTextStyle` to properly resolve imports.
+namespace margelo::nitro::mediacompositor { struct MediaCompositorTextStyle; }
 
 // Forward declarations of Swift defined types
 // Forward declaration of `HybridMediaCompositorSpec_cxx` to properly resolve imports.
@@ -17,9 +31,22 @@ namespace MediaCompositor { class HybridMediaCompositorSpec_cxx; }
 
 // Include C++ defined types
 #include "HybridMediaCompositorSpec.hpp"
+#include "MediaCompositorImageFormat.hpp"
+#include "MediaCompositorNormalizedRect.hpp"
+#include "MediaCompositorPreviewSpec.hpp"
+#include "MediaCompositorResult.hpp"
+#include "MediaCompositorTextAlign.hpp"
+#include "MediaCompositorTextOverlay.hpp"
+#include "MediaCompositorTextStyle.hpp"
+#include <NitroModules/Promise.hpp>
+#include <NitroModules/PromiseHolder.hpp>
 #include <NitroModules/Result.hpp>
 #include <exception>
+#include <functional>
 #include <memory>
+#include <optional>
+#include <string>
+#include <vector>
 
 /**
  * Contains specialized versions of C++ templated types so they can be accessed from Swift,
@@ -27,6 +54,197 @@ namespace MediaCompositor { class HybridMediaCompositorSpec_cxx; }
  */
 namespace margelo::nitro::mediacompositor::bridge::swift {
 
+  // pragma MARK: std::shared_ptr<Promise<MediaCompositorResult>>
+  /**
+   * Specialized version of `std::shared_ptr<Promise<MediaCompositorResult>>`.
+   */
+  using std__shared_ptr_Promise_MediaCompositorResult__ = std::shared_ptr<Promise<MediaCompositorResult>>;
+  inline std::shared_ptr<Promise<MediaCompositorResult>> create_std__shared_ptr_Promise_MediaCompositorResult__() noexcept {
+    return Promise<MediaCompositorResult>::create();
+  }
+  inline PromiseHolder<MediaCompositorResult> wrap_std__shared_ptr_Promise_MediaCompositorResult__(std::shared_ptr<Promise<MediaCompositorResult>> promise) noexcept {
+    return PromiseHolder<MediaCompositorResult>(std::move(promise));
+  }
+  
+  // pragma MARK: std::function<void(const MediaCompositorResult& /* result */)>
+  /**
+   * Specialized version of `std::function<void(const MediaCompositorResult&)>`.
+   */
+  using Func_void_MediaCompositorResult = std::function<void(const MediaCompositorResult& /* result */)>;
+  /**
+   * Wrapper class for a `std::function<void(const MediaCompositorResult& / * result * /)>`, this can be used from Swift.
+   */
+  class Func_void_MediaCompositorResult_Wrapper final {
+  public:
+    explicit Func_void_MediaCompositorResult_Wrapper(std::function<void(const MediaCompositorResult& /* result */)>&& func): _function(std::make_unique<std::function<void(const MediaCompositorResult& /* result */)>>(std::move(func))) {}
+    inline void call(MediaCompositorResult result) const noexcept {
+      _function->operator()(result);
+    }
+  private:
+    std::unique_ptr<std::function<void(const MediaCompositorResult& /* result */)>> _function;
+  } SWIFT_NONCOPYABLE;
+  Func_void_MediaCompositorResult create_Func_void_MediaCompositorResult(void* NON_NULL swiftClosureWrapper) noexcept;
+  inline Func_void_MediaCompositorResult_Wrapper wrap_Func_void_MediaCompositorResult(Func_void_MediaCompositorResult value) noexcept {
+    return Func_void_MediaCompositorResult_Wrapper(std::move(value));
+  }
+  
+  // pragma MARK: std::function<void(const std::exception_ptr& /* error */)>
+  /**
+   * Specialized version of `std::function<void(const std::exception_ptr&)>`.
+   */
+  using Func_void_std__exception_ptr = std::function<void(const std::exception_ptr& /* error */)>;
+  /**
+   * Wrapper class for a `std::function<void(const std::exception_ptr& / * error * /)>`, this can be used from Swift.
+   */
+  class Func_void_std__exception_ptr_Wrapper final {
+  public:
+    explicit Func_void_std__exception_ptr_Wrapper(std::function<void(const std::exception_ptr& /* error */)>&& func): _function(std::make_unique<std::function<void(const std::exception_ptr& /* error */)>>(std::move(func))) {}
+    inline void call(std::exception_ptr error) const noexcept {
+      _function->operator()(error);
+    }
+  private:
+    std::unique_ptr<std::function<void(const std::exception_ptr& /* error */)>> _function;
+  } SWIFT_NONCOPYABLE;
+  Func_void_std__exception_ptr create_Func_void_std__exception_ptr(void* NON_NULL swiftClosureWrapper) noexcept;
+  inline Func_void_std__exception_ptr_Wrapper wrap_Func_void_std__exception_ptr(Func_void_std__exception_ptr value) noexcept {
+    return Func_void_std__exception_ptr_Wrapper(std::move(value));
+  }
+  
+  // pragma MARK: std::optional<std::string>
+  /**
+   * Specialized version of `std::optional<std::string>`.
+   */
+  using std__optional_std__string_ = std::optional<std::string>;
+  inline std::optional<std::string> create_std__optional_std__string_(const std::string& value) noexcept {
+    return std::optional<std::string>(value);
+  }
+  inline bool has_value_std__optional_std__string_(const std::optional<std::string>& optional) noexcept {
+    return optional.has_value();
+  }
+  inline std::string get_std__optional_std__string_(const std::optional<std::string>& optional) noexcept {
+    return optional.value();
+  }
+  
+  // pragma MARK: std::optional<MediaCompositorImageFormat>
+  /**
+   * Specialized version of `std::optional<MediaCompositorImageFormat>`.
+   */
+  using std__optional_MediaCompositorImageFormat_ = std::optional<MediaCompositorImageFormat>;
+  inline std::optional<MediaCompositorImageFormat> create_std__optional_MediaCompositorImageFormat_(const MediaCompositorImageFormat& value) noexcept {
+    return std::optional<MediaCompositorImageFormat>(value);
+  }
+  inline bool has_value_std__optional_MediaCompositorImageFormat_(const std::optional<MediaCompositorImageFormat>& optional) noexcept {
+    return optional.has_value();
+  }
+  inline MediaCompositorImageFormat get_std__optional_MediaCompositorImageFormat_(const std::optional<MediaCompositorImageFormat>& optional) noexcept {
+    return optional.value();
+  }
+  
+  // pragma MARK: std::optional<double>
+  /**
+   * Specialized version of `std::optional<double>`.
+   */
+  using std__optional_double_ = std::optional<double>;
+  inline std::optional<double> create_std__optional_double_(const double& value) noexcept {
+    return std::optional<double>(value);
+  }
+  inline bool has_value_std__optional_double_(const std::optional<double>& optional) noexcept {
+    return optional.has_value();
+  }
+  inline double get_std__optional_double_(const std::optional<double>& optional) noexcept {
+    return optional.value();
+  }
+  
+  // pragma MARK: std::optional<MediaCompositorPreviewSpec>
+  /**
+   * Specialized version of `std::optional<MediaCompositorPreviewSpec>`.
+   */
+  using std__optional_MediaCompositorPreviewSpec_ = std::optional<MediaCompositorPreviewSpec>;
+  inline std::optional<MediaCompositorPreviewSpec> create_std__optional_MediaCompositorPreviewSpec_(const MediaCompositorPreviewSpec& value) noexcept {
+    return std::optional<MediaCompositorPreviewSpec>(value);
+  }
+  inline bool has_value_std__optional_MediaCompositorPreviewSpec_(const std::optional<MediaCompositorPreviewSpec>& optional) noexcept {
+    return optional.has_value();
+  }
+  inline MediaCompositorPreviewSpec get_std__optional_MediaCompositorPreviewSpec_(const std::optional<MediaCompositorPreviewSpec>& optional) noexcept {
+    return optional.value();
+  }
+  
+  // pragma MARK: std::optional<MediaCompositorTextAlign>
+  /**
+   * Specialized version of `std::optional<MediaCompositorTextAlign>`.
+   */
+  using std__optional_MediaCompositorTextAlign_ = std::optional<MediaCompositorTextAlign>;
+  inline std::optional<MediaCompositorTextAlign> create_std__optional_MediaCompositorTextAlign_(const MediaCompositorTextAlign& value) noexcept {
+    return std::optional<MediaCompositorTextAlign>(value);
+  }
+  inline bool has_value_std__optional_MediaCompositorTextAlign_(const std::optional<MediaCompositorTextAlign>& optional) noexcept {
+    return optional.has_value();
+  }
+  inline MediaCompositorTextAlign get_std__optional_MediaCompositorTextAlign_(const std::optional<MediaCompositorTextAlign>& optional) noexcept {
+    return optional.value();
+  }
+  
+  // pragma MARK: std::vector<MediaCompositorTextOverlay>
+  /**
+   * Specialized version of `std::vector<MediaCompositorTextOverlay>`.
+   */
+  using std__vector_MediaCompositorTextOverlay_ = std::vector<MediaCompositorTextOverlay>;
+  inline std::vector<MediaCompositorTextOverlay> create_std__vector_MediaCompositorTextOverlay_(size_t size) noexcept {
+    std::vector<MediaCompositorTextOverlay> vector;
+    vector.reserve(size);
+    return vector;
+  }
+  
+  // pragma MARK: std::optional<bool>
+  /**
+   * Specialized version of `std::optional<bool>`.
+   */
+  using std__optional_bool_ = std::optional<bool>;
+  inline std::optional<bool> create_std__optional_bool_(const bool& value) noexcept {
+    return std::optional<bool>(value);
+  }
+  inline bool has_value_std__optional_bool_(const std::optional<bool>& optional) noexcept {
+    return optional.has_value();
+  }
+  inline bool get_std__optional_bool_(const std::optional<bool>& optional) noexcept {
+    return optional.value();
+  }
+  
+  // pragma MARK: std::shared_ptr<Promise<void>>
+  /**
+   * Specialized version of `std::shared_ptr<Promise<void>>`.
+   */
+  using std__shared_ptr_Promise_void__ = std::shared_ptr<Promise<void>>;
+  inline std::shared_ptr<Promise<void>> create_std__shared_ptr_Promise_void__() noexcept {
+    return Promise<void>::create();
+  }
+  inline PromiseHolder<void> wrap_std__shared_ptr_Promise_void__(std::shared_ptr<Promise<void>> promise) noexcept {
+    return PromiseHolder<void>(std::move(promise));
+  }
+  
+  // pragma MARK: std::function<void()>
+  /**
+   * Specialized version of `std::function<void()>`.
+   */
+  using Func_void = std::function<void()>;
+  /**
+   * Wrapper class for a `std::function<void()>`, this can be used from Swift.
+   */
+  class Func_void_Wrapper final {
+  public:
+    explicit Func_void_Wrapper(std::function<void()>&& func): _function(std::make_unique<std::function<void()>>(std::move(func))) {}
+    inline void call() const noexcept {
+      _function->operator()();
+    }
+  private:
+    std::unique_ptr<std::function<void()>> _function;
+  } SWIFT_NONCOPYABLE;
+  Func_void create_Func_void(void* NON_NULL swiftClosureWrapper) noexcept;
+  inline Func_void_Wrapper wrap_Func_void(Func_void value) noexcept {
+    return Func_void_Wrapper(std::move(value));
+  }
+  
   // pragma MARK: std::shared_ptr<HybridMediaCompositorSpec>
   /**
    * Specialized version of `std::shared_ptr<HybridMediaCompositorSpec>`.
@@ -39,13 +257,22 @@ namespace margelo::nitro::mediacompositor::bridge::swift {
   using std__weak_ptr_HybridMediaCompositorSpec_ = std::weak_ptr<HybridMediaCompositorSpec>;
   inline std__weak_ptr_HybridMediaCompositorSpec_ weakify_std__shared_ptr_HybridMediaCompositorSpec_(const std::shared_ptr<HybridMediaCompositorSpec>& strong) noexcept { return strong; }
   
-  // pragma MARK: Result<double>
-  using Result_double_ = Result<double>;
-  inline Result_double_ create_Result_double_(double value) noexcept {
-    return Result<double>::withValue(std::move(value));
+  // pragma MARK: Result<std::shared_ptr<Promise<MediaCompositorResult>>>
+  using Result_std__shared_ptr_Promise_MediaCompositorResult___ = Result<std::shared_ptr<Promise<MediaCompositorResult>>>;
+  inline Result_std__shared_ptr_Promise_MediaCompositorResult___ create_Result_std__shared_ptr_Promise_MediaCompositorResult___(const std::shared_ptr<Promise<MediaCompositorResult>>& value) noexcept {
+    return Result<std::shared_ptr<Promise<MediaCompositorResult>>>::withValue(value);
   }
-  inline Result_double_ create_Result_double_(const std::exception_ptr& error) noexcept {
-    return Result<double>::withError(error);
+  inline Result_std__shared_ptr_Promise_MediaCompositorResult___ create_Result_std__shared_ptr_Promise_MediaCompositorResult___(const std::exception_ptr& error) noexcept {
+    return Result<std::shared_ptr<Promise<MediaCompositorResult>>>::withError(error);
+  }
+  
+  // pragma MARK: Result<std::shared_ptr<Promise<void>>>
+  using Result_std__shared_ptr_Promise_void___ = Result<std::shared_ptr<Promise<void>>>;
+  inline Result_std__shared_ptr_Promise_void___ create_Result_std__shared_ptr_Promise_void___(const std::shared_ptr<Promise<void>>& value) noexcept {
+    return Result<std::shared_ptr<Promise<void>>>::withValue(value);
+  }
+  inline Result_std__shared_ptr_Promise_void___ create_Result_std__shared_ptr_Promise_void___(const std::exception_ptr& error) noexcept {
+    return Result<std::shared_ptr<Promise<void>>>::withError(error);
   }
 
 } // namespace margelo::nitro::mediacompositor::bridge::swift
