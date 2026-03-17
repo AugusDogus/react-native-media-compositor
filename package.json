@@ -1,6 +1,6 @@
 {
   "name": "react-native-media-compositor",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "react-native-media-compositor is a react native package for compositing overlays into images and videos",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/module/index.js",

@@ -1,3 +1,9 @@
+## [1.0.2](https://github.com/AugusDogus/react-native-media-compositor/compare/v1.0.1...v1.0.2) (2026-03-17)
+
+### 🐛 Bug Fixes
+
+* **android:** apply EXIF orientation when composing images ([e7478c9](https://github.com/AugusDogus/react-native-media-compositor/commit/e7478c9269fd9842832ed01d171316b146eb6839))
+
 ## [1.0.1](https://github.com/AugusDogus/react-native-media-compositor/compare/v1.0.0...v1.0.1) (2026-03-16)
 
 ### 🐛 Bug Fixes
