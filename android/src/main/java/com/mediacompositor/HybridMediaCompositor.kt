@@ -4,9 +4,11 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.RectF
+import android.media.ExifInterface
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Handler
@@ -86,8 +88,9 @@ class HybridMediaCompositor : HybridMediaCompositorSpec() {
           requestedPath = request.outputPath,
           fallbackExtension = imageExtension(request)
         )
-        val sourceBitmap = BitmapFactory.decodeFile(inputFile.absolutePath)
+        val decodedBitmap = BitmapFactory.decodeFile(inputFile.absolutePath)
           ?: throw Error("The input image could not be decoded.")
+        val sourceBitmap = applyExifOrientation(decodedBitmap, inputFile)
         val cropLayout = previewCropLayout(
           sourceWidth = sourceBitmap.width,
           sourceHeight = sourceBitmap.height,
@@ -292,6 +295,35 @@ class HybridMediaCompositor : HybridMediaCompositorSpec() {
     } else {
       "mp4"
     }
+  }
+
+  private fun applyExifOrientation(bitmap: Bitmap, file: File): Bitmap {
+    val exif = ExifInterface(file.absolutePath)
+    val orientation = exif.getAttributeInt(
+      ExifInterface.TAG_ORIENTATION,
+      ExifInterface.ORIENTATION_NORMAL
+    )
+
+    val matrix = when (orientation) {
+      ExifInterface.ORIENTATION_ROTATE_90 -> Matrix().apply { postRotate(90f) }
+      ExifInterface.ORIENTATION_ROTATE_180 -> Matrix().apply { postRotate(180f) }
+      ExifInterface.ORIENTATION_ROTATE_270 -> Matrix().apply { postRotate(270f) }
+      ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> Matrix().apply { postScale(-1f, 1f) }
+      ExifInterface.ORIENTATION_FLIP_VERTICAL -> Matrix().apply { postScale(1f, -1f) }
+      ExifInterface.ORIENTATION_TRANSPOSE -> Matrix().apply {
+        postRotate(90f)
+        postScale(-1f, 1f)
+      }
+      ExifInterface.ORIENTATION_TRANSVERSE -> Matrix().apply {
+        postRotate(270f)
+        postScale(-1f, 1f)
+      }
+      else -> return bitmap
+    }
+
+    val corrected = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    if (corrected !== bitmap) bitmap.recycle()
+    return corrected
   }
 
   private fun cropBitmap(
